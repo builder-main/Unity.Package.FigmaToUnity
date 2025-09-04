@@ -15,6 +15,7 @@ namespace Figma.Core.Uss
 
         #region Const
         public const double tolerance = 0.01;
+
         internal static readonly UssStyle overrideClass = new("unity-base-override")
         {
             alignItems = Align.Center,
@@ -487,7 +488,7 @@ namespace Figma.Core.Uss
                 else
                 {
                     const double idealLineHeightFactor = 1.2;
-                    height = text.style.lineHeightPx;                                           // Unity text only aligns correctly when height is 1.2 times font size. Figma allows any text height
+                    height = text.style.lineHeightPx; // Unity text only aligns correctly when height is 1.2 times font size. Figma allows any text height
                     if (text.style.lineHeightPx <= text.style.fontSize * idealLineHeightFactor) // Figma centers text when lineheight is too small
                         text.style.textAlignVertical = TextAlignVertical.CENTER;
                 }
@@ -594,6 +595,8 @@ namespace Figma.Core.Uss
         #region Support Methods
         void AddSharedTextStyle(TextNode.Style style)
         {
+            const string defaultFont = "Inter-Regular";
+
             bool TryGetFontWithExtension(string font, out string resource)
             {
                 if (assetsInfo.GetAssetPath(font, KnownFormats.ttf, out string ttfPath))
@@ -608,26 +611,27 @@ namespace Figma.Core.Uss
                     return true;
                 }
 
-                resource = Resource("Inter-Regular");
+                resource = Resource(defaultFont);
                 return false;
             }
 
             (string, string) GetFont()
             {
-                string fontPostScriptName = style.fontPostScriptName ?? (style.fontFamily == "Inter" ? "Inter-Regular" : null);
-
-                if (fontPostScriptName == null)
+                if (string.IsNullOrEmpty(style.fontPostScriptName) && string.IsNullOrEmpty(style.fontFamily))
                     return (null, null);
 
+                string fontPostScriptName = style.fontPostScriptName ?? $"{style.fontFamily}-{style.fontStyle.Replace(" ", string.Empty)}";
+
                 string weightPostfix;
+
                 if (style.fontWeight > 0)
                     weightPostfix = Enum.GetValues(typeof(FontWeight)).GetValue((int)(style.fontWeight / 100) - 1).ToString();
                 else
                     weightPostfix = fontPostScriptName.Contains('-') ? fontPostScriptName.Split('-')[1].Replace(nameof(Index), string.Empty) : string.Empty;
 
                 string italicPostfix = style.italic || fontPostScriptName.Contains(nameof(FontStyle.Italic)) ? nameof(FontStyle.Italic) : string.Empty;
-
                 string fontName = $"{style.fontFamily}-{weightPostfix}{italicPostfix}";
+
                 if (!TryGetFontWithExtension(fontName, out string font) && !TryGetFontWithExtension(fontPostScriptName, out font))
                     Debug.LogWarning(Extensions.BuildTargetMessage("Cannot find Font", fontName, string.Empty));
 
@@ -643,6 +647,12 @@ namespace Figma.Core.Uss
 
             if (fontDefinition != null)
                 unityFontDefinition = Url(fontDefinition);
+
+            if (font == null && fontDefinition == null)
+            {
+                Debug.LogWarning($"Font style {style.fontFamily} {style.fontStyle} {style.fontPostScriptName} is not resolved");
+                unityFont = Url(defaultFont);
+            }
         }
         void AddFill(IGeometryMixin geometry)
         {
