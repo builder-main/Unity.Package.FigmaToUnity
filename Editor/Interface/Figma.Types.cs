@@ -266,6 +266,7 @@ namespace Figma.Internals
 
         public LayoutAlign layoutAlign { get; set; }
         public double layoutGrow { get; set; }
+        public LayoutPositioning layoutPositioning { get; set; }
         public LayoutSizing layoutSizingHorizontal { get; set; }
         public LayoutSizing layoutSizingVertical { get; set; }
         public Rect absoluteBoundingBox { get; set; }

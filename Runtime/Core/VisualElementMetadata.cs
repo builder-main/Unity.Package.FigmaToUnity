@@ -594,19 +594,6 @@ namespace Figma
 
                 return valueSize.Invalid() || valueSize == 0 ? parent.childCount : (int)(parentSize / ((2 * valueSize + (spacing.Invalid() ? 0 : spacing)) / 2));
             }
-            static int FindIndex(VisualElement value, IEnumerable<VisualElement> children)
-            {
-                int index = 0;
-                foreach (VisualElement child in children)
-                {
-                    if (child == value)
-                        return index;
-
-                    index++;
-                }
-
-                return -1;
-            }
 
             await Awaiters.EndOfFrame;
 
@@ -621,15 +608,15 @@ namespace Figma
 
             using PooledObject<List<VisualElement>> pooledObject = ListPool<VisualElement>.Get(out List<VisualElement> children);
 
-            children.AddRange(parent.Children().Where(x => x.resolvedStyle.display == DisplayStyle.Flex));
+            children.AddRange(parent.Children().Where(x => x.resolvedStyle.display is DisplayStyle.Flex && x.resolvedStyle.position is Position.Relative));
 
             if (children.Count == 0)
                 return;
 
             bool horizontalDirection = parent.resolvedStyle.flexDirection == FlexDirection.Row;
-            bool fixedSize = parent.resolvedStyle.flexWrap == Wrap.Wrap;
+            bool hasWrap = parent.resolvedStyle.flexWrap == Wrap.Wrap;
 
-            if (fixedSize)
+            if (hasWrap)
             {
                 for (float i = 0; i < 1; i += Time.deltaTime)
                 {
@@ -639,8 +626,8 @@ namespace Figma
                 }
             }
 
-            int lines = fixedSize ? GetLines(value, parent, spacing, horizontalDirection) : children.Count;
-            int index = FindIndex(value, children);
+            int lines = hasWrap ? GetLines(value, parent, spacing, horizontalDirection) : children.Count;
+            int index = children.IndexOf(value);
             float primaryMargin = lines > 0 && (index - 1) % lines != lines - 1 ? spacing : 0;
             float counterMargin = index >= lines ? spacing : 0;
 

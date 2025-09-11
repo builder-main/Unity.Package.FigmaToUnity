@@ -416,10 +416,9 @@ namespace Figma.Core.Uss
             }
             IDefaultFrameMixin parent = (IDefaultFrameMixin)((IBaseNodeMixin)layout).parent;
 
-            bool ignoreAutoLayout = layout is IDefaultFrameMixin { layoutPositioning: LayoutPositioning.ABSOLUTE };
             bool forceAutoHorizontal = false;
             bool forceAutoVertical = false;
-            if (parent.layoutMode is LayoutMode.NONE || ignoreAutoLayout)
+            if (parent.layoutMode is LayoutMode.NONE || layout.layoutPositioning is LayoutPositioning.ABSOLUTE)
             {
                 forceAutoHorizontal = layout.constraints.horizontal is ConstraintHorizontal.SCALE or ConstraintHorizontal.LEFT_RIGHT;
                 forceAutoVertical = layout.constraints.vertical is ConstraintVertical.SCALE or ConstraintVertical.TOP_BOTTOM;
@@ -433,7 +432,7 @@ namespace Figma.Core.Uss
 
                 if (BoxSizingCorrection(parent))
                     margin4 -= (layout as IGeometryMixin).GetOutsideBorderWidths();
-                if (Math.Abs(parent.itemSpacing) > tolerance && parent.primaryAxisAlignItems is not PrimaryAxisAlignItems.SPACE_BETWEEN && layout != parent.children.LastOrDefault(x => x.IsVisible()))
+                if (Math.Abs(parent.itemSpacing) > tolerance && parent.primaryAxisAlignItems is not PrimaryAxisAlignItems.SPACE_BETWEEN && layout != parent.children.LastOrDefault(x => x.IsVisible() && x is not ILayoutMixin { layoutPositioning: LayoutPositioning.ABSOLUTE }))
                 {
                     if (parent.layoutMode is LayoutMode.HORIZONTAL)
                         margin4.right += parent.itemSpacing;

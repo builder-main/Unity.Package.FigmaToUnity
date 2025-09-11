@@ -35,6 +35,7 @@ namespace Figma.Internals
         Constraints constraints { get; set; }
         LayoutAlign layoutAlign { get; set; }
         double layoutGrow { get; set; }
+        LayoutPositioning layoutPositioning { get; set; }
         LayoutSizing layoutSizingHorizontal { get; set; }
         LayoutSizing layoutSizingVertical { get; set; }
         Rect absoluteBoundingBox { get; set; }
@@ -102,7 +103,6 @@ namespace Figma.Internals
     public interface IDefaultFrameMixin : IDefaultShapeMixin, ICornerMixin, IRectangleCornerMixin, IChildrenMixin
     {
         LayoutMode layoutMode { get; set; }
-        LayoutPositioning layoutPositioning { get; set; }
         PrimaryAxisSizingMode primaryAxisSizingMode { get; set; }
         PrimaryAxisAlignItems primaryAxisAlignItems { get; set; }
         CounterAxisSizingMode counterAxisSizingMode { get; set; }
