@@ -60,8 +60,8 @@ namespace Figma
 
             return color;
         }
-        // Magical formula found by testing different methods. including LinearToGammaSpaceExact(a), 1-GammaToLinearSpaceExact(1-a), pow(a, 1/2.2), pow(a, 1/1.8), 1.0-pow(1-a, 2.2). This method yielded results close to figma with only one layer of blending. With multiple layers all tried corrections becomes too dark
-        internal static double AlphaCorrection(double a) => (forceAlphaCorrection || UnityEditor.PlayerSettings.colorSpace is UnityEngine.ColorSpace.Linear) && a is > 0.0 and < 1.0 ? Mathf.LinearToGammaSpace((float)a) : a;
+        // Magical formula found by testing different methods. including LinearToGammaSpaceExact(a), 1-GammaToLinearSpaceExact(1-a), pow(a, 1/2.2), pow(a, 1/1.8), 1.0-pow(1-a, 2.2). This method yielded results close to figma with only one layer of blending. However, with multiple semitransparent elements, this alpha correction makes them darker than figma
+        public static double AlphaCorrection(double a) => (forceAlphaCorrection || UnityEditor.PlayerSettings.colorSpace is UnityEngine.ColorSpace.Linear) && a is > 0.0 and < 1.0 ? 1.0f - Mathf.GammaToLinearSpace(1.0f - (float)a) : a;
         #endregion
 
         #region Support Methods
