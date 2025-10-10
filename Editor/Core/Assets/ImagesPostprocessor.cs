@@ -13,8 +13,11 @@ namespace Figma.Core.Assets
             if (!assetPath.Contains("UI/Assets/Images")) return;
 
             if (assetImporter is SVGImporter svgImporter)
+#if UNITY_6000_3_OR_NEWER
+                svgImporter.SvgType = SVGType.UISVGImage;
+#else
                 svgImporter.SvgType = SVGType.UIToolkit;
-
+#endif
             if (assetImporter is not TextureImporter textureImporter)
                 return;
 
