@@ -5,6 +5,7 @@
   "version": "1.3.3",
   "unity": "2022.3",
   "dependencies": {
+    "com.trackman.asyncawaitutil": "1.0.6"
   },
   "author": "TrackMan",
   "type": "trackman.package",
